@@ -28,22 +28,39 @@ public class TradeOpen {
         String query = "INSERT INTO trade_open(trade_id, order_type, symbol, no_of_shares, entry_price, current_price, p_l, user_id) " +
                 "VALUES (nextval('trade_id_increment'), ?, ?, ?, ?, ?, ?, ?)";
         GetStockData stockData = new GetStockData(trade.getSymbol());
+        int ID = trade.getUserID();
+        if (trade.getOrderType().equals("buy")){
+            if (!userInfo.enoughBalance(ID, (stockData.getBidPrice()*trade.getNumOfShares()))){
+                return false;
+            }
+        }
+        else{
+            if (!userInfo.enoughBalance(trade.getUserID(), (stockData.getAskPrice()*trade.getNumOfShares()))){
+                return false;
+            }
+        }
         try{
             PreparedStatement preparedStatement = connection.prepareStatement(query);
             preparedStatement.setString(1, trade.getOrderType());
             preparedStatement.setString(2, trade.getSymbol());
             preparedStatement.setInt(3, trade.getNumOfShares());
+            
             if (trade.getOrderType().equals("buy")){
                 preparedStatement.setDouble(4, stockData.getBidPrice());
+                preparedStatement.setDouble(5, stockData.getCurrentPrice()); //CHange to current price
+                preparedStatement.setDouble(6, trade.getPL());
+                preparedStatement.setInt(7, trade.getUserID());
+                userInfo.updatingBuyingPower(userInfo.getUsername(trade.getUserID()), (stockData.getBidPrice()*trade.getNumOfShares()), 0, 1);
+                return preparedStatement.executeUpdate() >= 1;
             }
             else{
                 preparedStatement.setDouble(4, stockData.getAskPrice());
+                preparedStatement.setDouble(5, stockData.getCurrentPrice()); //CHange to current price
+                preparedStatement.setDouble(6, trade.getPL());
+                preparedStatement.setInt(7, trade.getUserID());
+                userInfo.updatingBuyingPower(userInfo.getUsername(trade.getUserID()), (stockData.getAskPrice()*trade.getNumOfShares()), 0, 1);
+                return preparedStatement.executeUpdate() >= 1;
             }
-            preparedStatement.setDouble(5, stockData.getCurrentPrice()); //CHange to current price
-            preparedStatement.setDouble(6, trade.getPL());
-            preparedStatement.setInt(7, trade.getUserID());
-            //Checks if the trade was opened or not.
-            return preparedStatement.executeUpdate() >= 1;
         }catch (SQLException e){
             System.out.println("something went wrong while creating a new trade.\n"+e);
         }
@@ -54,9 +71,7 @@ public class TradeOpen {
 
     //Get the lasted trade that was opened
     public Trade getLatestTrade(String username)  {
-        //Important
-        updateOpenTradePrices(username);
-        refreshPL(username);
+
         trade = new Trade();
         String query = "SELECT * FROM trade_open WHERE user_id = ? AND trade_id = (SELECT max(trade_id) FROM trade_open WHERE user_id = ?)";
         try {
@@ -83,9 +98,7 @@ public class TradeOpen {
 
     //Get an open trade based on a tradeID
     public Trade getOpenTradeID(String username, int tradeID)  {
-        //Important
-        updateOpenTradePrices(username);
-        refreshPL(username);
+
         trade = new Trade();
         String query = "SELECT * FROM trade_open WHERE user_id = ? AND trade_id = ?";
         try {
@@ -113,9 +126,7 @@ public class TradeOpen {
 
     //Get the open trade(s) based on a orderTpe.
     public ArrayList<Trade> getTradeOrderType(String username, String orderType)  {
-        //Important
-        updateOpenTradePrices(username);
-        refreshPL(username);
+
         trade = new Trade();
         list = new ArrayList<>();
         String query = "SELECT * FROM trade_open WHERE user_id = ? AND order_type = ? ORDER BY trade_id ASC";
@@ -145,9 +156,7 @@ public class TradeOpen {
 
     //Get the open trade(s) based on a Winners.
     public ArrayList<Trade> getOpenTradeWinners(String username)  {
-        //Important
-        updateOpenTradePrices(username);
-        refreshPL(username);
+
         trade = new Trade();
         list = new ArrayList<>();
         String query = "SELECT * FROM trade_open WHERE user_id = ? AND p_l > 0 ORDER BY trade_id DESC";
@@ -177,9 +186,7 @@ public class TradeOpen {
 
     //Get the open trade(s) based on a Losers.
     public ArrayList<Trade> getCloseTradeLosers(String username)  {
-        //Important
-        updateOpenTradePrices(username);
-        refreshPL(username);
+
         trade = new Trade();
         list = new ArrayList<>();
         String query = "SELECT * FROM trade_open WHERE user_id = ? AND p_l < 0 ORDER BY trade_id DESC";
@@ -208,9 +215,7 @@ public class TradeOpen {
 
     //Get the open trade(s) based on a symbol(s).
     public ArrayList<Trade> getOpenTradeSymbol(String username, String... symbols)  {
-        //Important
-        updateOpenTradePrices(username);
-        refreshPL(username);
+
         trade = new Trade();
         list = new ArrayList<>();
         String query = "SELECT * FROM trade_open WHERE user_id = ? AND symbol = ? ORDER BY trade_id ASC";
@@ -241,15 +246,13 @@ public class TradeOpen {
         return list;
     }
 
-    //Get all the trades that the user currently has open
+    //Get all the trades that the user currently has open in descending order
     public ArrayList<Trade> getAllOpenTrades(String username)  {
-        //Important
-        updateOpenTradePrices(username);
-        refreshPL(username);
+        
         trade = new Trade();
         list = new ArrayList<>();
 
-        String query = "SELECT * FROM trade_open WHERE user_id = ? ORDER BY trade_id ASC";
+        String query = "SELECT * FROM trade_open WHERE user_id = ? ORDER BY trade_id DESC";
         try {
             PreparedStatement preparedStatement = connection.prepareStatement(query);
             preparedStatement.setInt(1, userInfo.getID(username));
@@ -324,7 +327,7 @@ public class TradeOpen {
                 preparedStatement.executeUpdate();
             }
         } catch (SQLException e){
-            System.out.println("something went wrong while updating the current prices.\n"+e);
+            System.out.println("something went wrong while updating- 000 -- the current prices.\n"+e);
         }
     }
 
@@ -389,7 +392,7 @@ public class TradeOpen {
                 return resultSet.getDouble(1);
             }
         }catch (SQLException e){
-            System.out.println("somwthing went wrong while getting open trade stat: OpenPL.\n"+e);
+            System.out.println("something went wrong while getting open trade stat: OpenPL.\n"+e);
         }
 
         return 0;

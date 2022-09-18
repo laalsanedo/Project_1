@@ -22,22 +22,10 @@ public class OpenTrade {
     //=================================== CREATE A NEW TRADE ===================================
 
     public boolean newTrade(String username, Trade trade) {
-        double investment = trade.getEntryPrice() *trade.getNumOfShares();
-        //check if enough buying power
-        if (userInfo.getBuyingPower(username) >= investment){
-            System.out.println("Enough balance");
-            boolean result = tradeOpen.newTrade(trade);
-            if (result){
-                userInfo.updatingBuyingPower(username, investment, 0, 1);
-                return true;
-            }
-        }
-        else{
-            return false;
-        }
-        return false;
+        trade.setUserID(userInfo.getID(username));
+        refreshPL(username);
+        return tradeOpen.newTrade(trade);
     }
-
     //=================================== GETS OPEN TRADES ===================================
 
     //Get the lasted trade that was opened
@@ -96,6 +84,7 @@ public class OpenTrade {
 
     //Update the PL
     public void refreshPL(String username) {
+        updateOpenTradePrices(username);
         tradeOpen.refreshPL(username);
     }
 
@@ -116,7 +105,6 @@ public class OpenTrade {
         stats.setShorts(getNumOfShorts(username));
         stats.setShortW(getNumOfShortWinner(username));
         stats.setShortL(getNumOfShortLoser(username));
-        stats.setOpenPLPercent(getPercentReturn(username));
         stats.setWinPercent(getPercentageWinners(username));
         stats.setLossPercent(getPercentageLosers(username));
         stats.setBuyPercent(getPercentageBuys(username));
@@ -197,11 +185,6 @@ public class OpenTrade {
 
 
     //====================================== DERIVED STATS ======================================
-
-    //%Profit/Loss
-    public double getPercentReturn(String username) {
-        return ((getCurrentInvestment(username)/getInvestmentInto(username))-1)*100;
-    }
 
     //Get % losers ---D
     public double getPercentageLosers(String username) {

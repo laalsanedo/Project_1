@@ -22,6 +22,11 @@ public class AccountInfo {
         return userInfo.checkCredentials(username, password);
     }
 
+    //Check whether the user exists:
+    public boolean checkUsername(String username){
+        return userInfo.checkUsername(username);
+    }
+
     //================================ CREATING A NEW USER ================================
 
     //Creates a new user

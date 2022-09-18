@@ -18,6 +18,11 @@ public class TestImportant {
     @Test
     public void closeTrade(){
         Trade trade = openTrade.getLatestTrade("laalsanedo");
-        closeTrade.closeSymbol("laalsanedo", "AAPL");
+        closeTrade.closeAllTrades("laalsanedo");
+    }
+
+    @Test
+    public void updateTrade(){
+        openTrade.updateOpenTradePrices("laalsanedo");
     }
 }

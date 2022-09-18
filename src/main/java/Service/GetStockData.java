@@ -30,7 +30,7 @@ public class GetStockData {
         //Setting the symbol so that it can be reused
         this.symbol = symbol.toUpperCase();
         //Building URL to get data from the TD.
-        String URL = tdapi.buildQuotesURL(symbol.toUpperCase().trim());
+        String URL = tdapi.buildQuotesURL(symbol);
         //Getting the stock data in a JSON Format.
         node = tdapi.parseQuotes(tdapi.getResponse(URL));
     }
@@ -60,6 +60,10 @@ public class GetStockData {
         quote.setTotalVolume(getTotalVolume());
         return quote;
     }
+
+
+
+
 
     //==================================  GETTERS ==================================
 

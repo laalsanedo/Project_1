@@ -34,6 +34,22 @@ public class UserInfo {
         return 0;
     }
 
+    //Get the username based on UserID
+    public String getUsername(int userID) {
+        String query = "SELECT username FROM user_info WHERE id = ?"; //Query to get the userID.
+        try{
+            PreparedStatement preparedStatement = connection.prepareStatement(query);
+            preparedStatement.setInt(1, userID);
+            resultSet = preparedStatement.executeQuery();
+            if (resultSet.next())
+                return resultSet.getString(1);
+        }catch (SQLException e){
+            System.out.println("something went wrong while getting userID.\n"+e);
+        }
+        return null;
+    }
+
+
     //Get the Total Balance
     public double getTotalBalance(String username) {
         String query = "SELECT total_balance FROM user_info WHERE username = ?"; //Query to get the totalBalance.
@@ -116,6 +132,25 @@ public class UserInfo {
         return false;
     }
 
+    //Check if enough balance
+    public boolean enoughBalance(int ID, double investment){
+        String query = "SELECT buying_power FROM user_info WHERE id = ?";
+        try {
+            PreparedStatement preparedStatement = connection.prepareStatement(query);
+            preparedStatement.setInt(1, ID);
+            resultSet = preparedStatement.executeQuery();
+            if (resultSet.next() && resultSet.getDouble(1) >= investment){
+                return true;
+            }
+            else {
+                return false;
+            }
+        } catch (SQLException e) {
+            System.out.println(e);
+        }
+        return false;
+    }
+
     //================================ UPDATE BALANCES ================================
 
     //Update used when closing
@@ -141,7 +176,7 @@ public class UserInfo {
                 //Subtracting from buying power.
                 String query = "UPDATE user_info SET buying_power = buying_power - ? WHERE id = ?";
                 PreparedStatement preparedStatement = connection.prepareStatement(query);
-                preparedStatement.setDouble(1, PL+investment);
+                preparedStatement.setDouble(1, (PL+investment));
                 preparedStatement.setInt(2, getID(username));
                 preparedStatement.executeUpdate();
                 return true;
@@ -150,7 +185,7 @@ public class UserInfo {
                 //Adding to buying power.
                 String query = "UPDATE user_info SET buying_power = buying_power + ? WHERE id = ?";
                 PreparedStatement preparedStatement = connection.prepareStatement(query);
-                preparedStatement.setDouble(1, PL+investment);
+                preparedStatement.setDouble(1, (PL+investment));
                 preparedStatement.setInt(2, getID(username));
                 preparedStatement.executeUpdate();
                 return true;

@@ -173,6 +173,7 @@ public class TradeHistory {
     //Get the close trade(s) based on a Winners.
     public ArrayList<Trade> getCloseTradeWinners(String username) {
         trade = new Trade();
+        list = new ArrayList<>();
         String query = "SELECT * FROM trade_history WHERE user_id = ? AND p_l > 0 ORDER BY trade_id DESC";
         try {
             PreparedStatement preparedStatement = connection.prepareStatement(query);

@@ -44,6 +44,9 @@ public class TokenHandler {
 
     //METHOD TO DECODE THE JWT AND VERIFY
     public String verify(String token){
+        if (token == null){
+            return null;
+        }
         Verifier verifier = HMACVerifier.newVerifier(getSecret_key());
         try {
             JWT jwt = JWT.getDecoder().decode(token, verifier);
