@@ -2,13 +2,14 @@ package Util;
 
 import java.sql.Connection;
 import java.sql.DriverManager;
-import java.sql.SQLException;
 
 public class Connectivity {
 
-    private static final String url = "jdbc:postgresql://localhost:1433/TradingSimulator";
-    private static final String username = "postgres";
-    private static final String password = "2525";
+    private static final String url = "jdbc:sqlserver://patelr55.database.windows.net:1433;database=db1;" +
+                                        "encrypt=true;trustServerCertificate=false;" +
+                                        "hostNameInCertificate=*.database.windows.net;loginTimeout=30;";
+    private static final String username = "revature";
+    private static final String password = "Password@123";
 
     private static Connection connection;
 

@@ -25,8 +25,8 @@ public class TradeOpen {
     //=================================== CREATE A NEW TRADE ===================================
 
     public boolean newTrade(Trade trade)  {
-        String query = "INSERT INTO trade_open(trade_id, order_type, symbol, no_of_shares, entry_price, current_price, p_l, user_id) " +
-                "VALUES (nextval('trade_id_increment'), ?, ?, ?, ?, ?, ?, ?)";
+        String query = "INSERT INTO trade_open( order_type, symbol, no_of_shares, entry_price, current_price, p_l, user_id) " +
+                "VALUES ( ?, ?, ?, ?, ?, ?, ?)";
         GetStockData stockData = new GetStockData(trade.getSymbol());
         int ID = trade.getUserID();
         if (trade.getOrderType().equals("buy")){

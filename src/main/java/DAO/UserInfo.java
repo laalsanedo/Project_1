@@ -86,8 +86,8 @@ public class UserInfo {
 
     //Create a new Account
     public Account createNewAccount(String username, String password)  {
-        String query = "INSERT INTO user_info(id, username, password, total_balance, buying_power)" +
-                "VALUES (nextval('id_increment'), ?, ?, ?, ?)"; //Inserting a new field in the user_info table
+        String query = "INSERT INTO user_info( username, password, total_balance, buying_power)" +
+                "VALUES ( ?, ?, ?, ?)"; //Inserting a new field in the user_info table
         try{
             PreparedStatement preparedStatement = connection.prepareStatement(query);
             preparedStatement.setString(1, username);
