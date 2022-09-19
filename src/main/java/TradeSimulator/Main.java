@@ -59,7 +59,7 @@ public class Main {
         app.post("/ts/login/newuser/", context -> {
             if(info.newUser(context.header("username"), context.header("password"))){
                 context.status(200);
-                context.cookieStore("jwtKey", tokenHandler.encoder(context.header("username")));
+                context.header(tokenHandler.encoder(context.header("username")));
             }
             else{
                 context.status(401);
@@ -110,7 +110,6 @@ public class Main {
         app.post("/ts/opentrade/open" , context -> {
             String username = tokenHandler.verify(context.header("jwtKey"));
             Trade trade = mapper.readValue(context.body(), Trade.class);
-            System.out.println(trade.getSymbol()+trade.getNumOfShares()+trade.getOrderType());
             if (info.checkUsername(username)){
                 if (open.newTrade(username, trade)){
                     context.result("true");

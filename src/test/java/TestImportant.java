@@ -8,7 +8,7 @@ public class TestImportant {
     OpenTrade openTrade = new OpenTrade();
     CloseTrade closeTrade = new CloseTrade();
     AccountInfo info = new AccountInfo();
-    //testing the update balance and buying power
+
     @Test
     public void openTrade(){
         Trade trade = new Trade(10, info.getID("laalsanedo"), "buy", "AAPL");
